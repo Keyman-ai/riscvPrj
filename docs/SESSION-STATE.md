@@ -19,6 +19,12 @@
   `(sleep 4; printf 'abis\x03') | timeout 12 qemu-system-riscv64 -M virt -smp 2 -m 128M -nographic -kernel build/riscvPrj.elf`
 - QEMU virt 关键地址：OpenSBI 0x80000000 / 内核 0x80200000 / UART 0x10000000 / CLINT 0x02000000 / PLIC 0x0c000000 / dtb 0x87000000
 - UART = PLIC 中断源 **10**；PLIC stride（QEMU 特有）enable=0x80 / context=0x1000（§6 坑 9）
+- **设备失联自救（WoL）**：SSH 超时时，Windows 侧（本机 ICS 网段 IP `192.168.137.10`）先
+  `arp -a` 查设备 MAC（实测 `2e-1b-88-69-2c-92`，有缓存说明二层还通），向广播地址 9 端口
+  发 WoL 魔术包即可远程唤醒（PowerShell UdpClient 6×0xFF + MAC×16）；唤醒后 ping 通 22
+  端口通，直接 `rw_connect` 即可。设备休眠过一次，此法已实测有效
+- 代码已推送 GitHub：https://github.com/Keyman-ai/riscvPrj（推送路径：远程主机无外网 →
+  `rw_sync` 拉到本地镜像 → 本地 Windows git push；远程 `.git` 废弃，以本地镜像为推送出口）
 
 ## 3. 里程碑状态
 
