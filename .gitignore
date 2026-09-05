@@ -1,0 +1,10 @@
+build/
+*.o
+*.elf
+
+# 3 月串口调试残留 (与本项目无关)
+ics_setup_log.txt
+serial_*
+setup_ics.ps1
+.vscode/
+.dsh-*
