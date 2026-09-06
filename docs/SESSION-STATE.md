@@ -23,6 +23,11 @@
   `arp -a` 查设备 MAC（实测 `2e-1b-88-69-2c-92`，有缓存说明二层还通），向广播地址 9 端口
   发 WoL 魔术包即可远程唤醒（PowerShell UdpClient 6×0xFF + MAC×16）；唤醒后 ping 通 22
   端口通，直接 `rw_connect` 即可。设备休眠过一次，此法已实测有效
+- **断连三次的完整诊断顺序（2026-09-05 实录）**：①ping .19 → ②ARP 有 MAC → WoL 唤醒
+  （休眠）；③ARP 空 + ping 全不通 → **先查 Windows 侧**：ping .1 不通 + `Get-Service
+  SharedAccess` 为 Stopped = ICS 服务停了、整个 192.168.137.x 网段消失 → `Start-Service
+  SharedAccess` 拉起 → 网段恢复、板子立即可达（WoL 不必发，且网段没了也发不出去）。
+  教训：ARP 空 ≠ 板子断电，先查 ICS 服务再下结论
 - 代码已推送 GitHub：https://github.com/Keyman-ai/riscvPrj（推送路径：远程主机无外网 →
   `rw_sync` 拉到本地镜像 → 本地 Windows git push；远程 `.git` 废弃，以本地镜像为推送出口）
 
